@@ -38,7 +38,7 @@ impl Default for ClientBuilder {
         Self {
             base_url: DEFAULT_BASE_URL.to_string(),
             secret: Secret::default(),
-            timeout: Duration::from_secs(300),
+            timeout: Duration::from_secs(30),
             header: default_header,
         }
     }

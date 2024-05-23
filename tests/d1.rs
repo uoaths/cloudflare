@@ -1,7 +1,6 @@
 mod common;
 
-
-#[cfg(feature="d1")]
+#[cfg(feature = "d1")]
 mod tests_d1 {
     const MOCK_DATABASE_ID: &str = "1a9ab71c-14b6-4dba-8397-4484a4143953";
 
@@ -36,13 +35,13 @@ mod tests_d1 {
               }"#,
             );
         });
-    
+
         common::client()
             .query_d1_database(MOCK_DATABASE_ID, "", &[""])
             .await
             .unwrap();
     }
-    
+
     #[tokio::test]
     async fn test_fetch_query_d1_database_create_table() {
         common::server().mock(|when, then| {
@@ -75,7 +74,7 @@ mod tests_d1 {
             }"#,
             );
         });
-    
+
         common::client()
             .query_d1_database(
                 MOCK_DATABASE_ID,
@@ -90,7 +89,7 @@ mod tests_d1 {
             .await
             .unwrap();
     }
-    
+
     #[tokio::test]
     async fn test_fetch_query_d1_database_insert_sql() {
         common::server().mock(|when, then| {
@@ -123,7 +122,7 @@ mod tests_d1 {
                 }"#,
             );
         });
-    
+
         common::client()
             .query_d1_database(
                 MOCK_DATABASE_ID,
@@ -133,7 +132,7 @@ mod tests_d1 {
             .await
             .unwrap();
     }
-    
+
     #[tokio::test]
     async fn test_fetch_query_d1_database_select_sql() {
         common::server().mock(|when, then| {
@@ -181,7 +180,7 @@ mod tests_d1 {
                 }"#,
             );
         });
-    
+
         common::client()
             .query_d1_database(MOCK_DATABASE_ID, "SELECT * FROM PERSON", &[])
             .await

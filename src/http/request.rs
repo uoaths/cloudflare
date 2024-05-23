@@ -95,7 +95,7 @@ impl RequestBuilder {
     {
         let response = self.inner.send().await?;
 
-        Ok(response.json::<T>().await?)
+        return Ok(response.json::<T>().await?);
     }
 
     pub(crate) fn with_bearer_auth(self, value: &String) -> Self {

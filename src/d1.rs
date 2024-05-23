@@ -1,13 +1,10 @@
-pub mod types;
-
+use serde::Deserialize;
+use serde::Serialize;
 use serde_json::json;
+use serde_json::Value;
 
-use crate::{
-    client::{Client, ClientResult},
-    types::Response,
-};
-
-use self::types::*;
+use crate::http::client::{Client, ClientResult};
+use crate::http::response::Response;
 
 impl Client {
     // https://developers.cloudflare.com/api/operations/cloudflare-d1-create-database
@@ -91,5 +88,72 @@ impl Client {
             }))
             .send()
             .await
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum D1DatabaseVersion {
+    #[serde(rename(deserialize = "alpha"))]
+    Alpha,
+
+    #[serde(rename(deserialize = "beta"))]
+    Beta,
+
+    #[serde(rename(deserialize = "production"))]
+    Production,
+}
+
+#[rustfmt::skip]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ListD1DatabasesResult {
+    // D1 database name
+    pub name: String,
+
+    // D1 database uuid
+    pub uuid: String,
+
+    // Specifies the timestamp the resource was created as an ISO8601 string
+    pub created_at: String,
+
+    // D1 database version
+    pub version: D1DatabaseVersion
+}
+
+#[rustfmt::skip]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct D1DatabaseMeta {
+    pub served_by:    String,
+    pub changed_db:   bool,
+    pub changes:      f64,
+    pub duration:     f64,
+    pub rows_read:    f64,
+    pub last_row_id:  f64,
+    pub rows_written: f64,
+    pub size_after:   f64,
+}
+
+#[rustfmt::skip]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QueryD1DatabaseResult {
+    pub meta:    D1DatabaseMeta,
+    pub success: bool,
+    pub results: Vec<Value>,
+}
+
+impl QueryD1DatabaseResult {
+    pub fn results<T>(self) -> ClientResult<Vec<T>>
+    where
+        T: for<'a> Deserialize<'a>,
+    {
+        if self.results.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let mut result = Vec::with_capacity(self.results.len());
+        for value in self.results {
+            result.push(serde_json::from_value::<T>(value).unwrap())
+        }
+
+        Ok(result)
     }
 }
